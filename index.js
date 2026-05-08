@@ -70,7 +70,6 @@ function callClaude(message, callback) {
       'Content-Type': 'application/json',
       'x-api-key': CLAUDE_API_KEY,
       'anthropic-version': '2023-06-01',
-      'anthropic-beta': 'messages-2023-12-15',
       'Content-Length': Buffer.byteLength(body)
     }
   };
@@ -110,7 +109,13 @@ function sendWhatsApp(to, message, callback) {
   const req = https.request(options, (res) => {
     let data = '';
     res.on('data', chunk => data += chunk);
-    res.on('end', () => callback && callback(null, data));
+    res.on('end', () => {
+      console.log(`[Whapi] status=${res.statusCode} body=${data}`);
+      if (res.statusCode >= 400) {
+        return callback && callback(new Error(`Whapi ${res.statusCode}: ${data}`));
+      }
+      callback && callback(null, data);
+    });
   });
   req.on('error', err => callback && callback(err));
   req.write(body);
