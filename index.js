@@ -56,7 +56,7 @@ REGLAS IMPORTANTES:
 
 function callClaude(message, callback) {
   const body = JSON.stringify({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-haiku-4-5-20251001',
     max_tokens: 300,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: message }]
@@ -70,6 +70,7 @@ function callClaude(message, callback) {
       'Content-Type': 'application/json',
       'x-api-key': CLAUDE_API_KEY,
       'anthropic-version': '2023-06-01',
+      'anthropic-beta': 'messages-2023-12-15',
       'Content-Length': Buffer.byteLength(body)
     }
   };
@@ -80,6 +81,7 @@ function callClaude(message, callback) {
     res.on('end', () => {
       try {
         const parsed = JSON.parse(data);
+        console.log('Claude response:', JSON.stringify(parsed).substring(0, 200));
         const text = parsed.content && parsed.content[0] ? parsed.content[0].text : 'Disculpa, intenta de nuevo 🙏';
         callback(null, text);
       } catch (e) {
